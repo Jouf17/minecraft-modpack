@@ -1,9 +1,12 @@
 $ErrorActionPreference = "Stop"
 
+# Force TLS 1.2 pour les telechargements HTTPS sur Windows PowerShell 5.1.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 # Configuration du modpack.
 $ManifestUrl = "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/manifest.json"
 $InstanceName = "1.20.1"
-$ServerAddress = "82.165.57.177"
+$ServerAddress = "82.165.57.177:25566"
 $ModsPath = Join-Path $env:APPDATA "PrismLauncher\instances\$InstanceName\.minecraft\mods"
 
 # Chemins Prism courants sous Windows.
@@ -128,7 +131,18 @@ try {
         }
 
         Write-Host "Telechargement : $($Mod.name)"
-        Invoke-WebRequest -Uri $Mod.url -OutFile $Destination
+
+        try {
+            Invoke-WebRequest -Uri $Mod.url -OutFile $Destination -MaximumRedirection 10
+        }
+        catch {
+            if (Test-Path -LiteralPath $Destination -PathType Leaf) {
+                Remove-Item -LiteralPath $Destination -Force
+            }
+
+            throw "Impossible de telecharger $($Mod.name). Verifie que cette URL existe et que la release GitHub est publique : $($Mod.url)`nDetail : $($_.Exception.Message)"
+        }
+
         Write-Ok "Installe : $($Mod.name)"
     }
 

@@ -14,7 +14,7 @@ Petit launcher/updater maison pour rejoindre le serveur Minecraft Forge modde.
 Le script verifie les mods listes dans `manifest.json`, telecharge uniquement ceux qui manquent, les place dans le dossier mods de l'instance Prism, puis lance Prism Launcher sur le serveur :
 
 ```text
-82.165.57.177
+82.165.57.177:25566
 ```
 
 ## Fonctionnement
