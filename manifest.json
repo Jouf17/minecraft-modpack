@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "mods": [
+    {
+      "name": "customships-1.0.0.jar",
+      "url": "https://github.com/Jouf17/custom-ship/releases/download/v1.0.0/customships-1.0.0.jar"
+    }
+  ]
+}
