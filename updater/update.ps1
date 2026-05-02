@@ -340,7 +340,14 @@ try {
     Update-Mods -Config $Config -ModsPath $ModsPath
 
     Write-Step "Lancement du jeu"
-    Start-Process -FilePath $PrismPath -ArgumentList @("--launch", $Instance.Name, "--server", $Config.serverAddress)
+
+    $LaunchArguments = @("--launch", $Instance.Name)
+
+    if ($Config.joinServerOnLaunch) {
+        $LaunchArguments += @("--server", $Config.serverAddress)
+    }
+
+    Start-Process -FilePath $PrismPath -ArgumentList $LaunchArguments
     Write-Ok "Minecraft se lance"
 }
 catch {

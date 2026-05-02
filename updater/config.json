@@ -1,6 +1,7 @@
 {
   "manifestUrl": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/manifest.json",
   "serverAddress": "82.165.57.177:25566",
+  "joinServerOnLaunch": false,
   "preferredInstanceNames": [
     "CustomUniverse",
     "1.20.1"

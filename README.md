@@ -8,7 +8,9 @@ Package joueur pour rejoindre le serveur Minecraft Forge modde.
 2. Extraire le ZIP dans un dossier.
 3. Double-cliquer sur `Jouer.bat`.
 
-Le launcher installe Prism Launcher si besoin, importe l'instance fournie si elle manque, met les mods a jour depuis le manifest GitHub, puis lance le jeu sur :
+Le launcher installe Prism Launcher si besoin, importe l'instance fournie si elle manque, met les mods a jour depuis le manifest GitHub, puis lance le jeu.
+
+Le serveur a rejoindre dans la liste Minecraft est :
 
 ```text
 82.165.57.177:25566
