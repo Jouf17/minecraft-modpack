@@ -1,0 +1,14 @@
+{
+  "manifestUrl": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/manifest.json",
+  "serverAddress": "82.165.57.177:25566",
+  "preferredInstanceNames": [
+    "CustomUniverse",
+    "1.20.1"
+  ],
+  "instanceArchive": "instance/1.20.1.zip",
+  "homeModPatterns": [
+    "customships*.jar",
+    "customuniverse*.jar"
+  ],
+  "removeMissingHomeMods": true
+}
