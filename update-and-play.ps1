@@ -68,6 +68,25 @@ function Find-PrismLauncher {
     return $null
 }
 
+function Read-RemoteJson {
+    param([Parameter(Mandatory = $true)][string] $Url)
+
+    $NoCacheUrl = $Url
+
+    if ($NoCacheUrl.Contains("?")) {
+        $NoCacheUrl = "$NoCacheUrl&cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+    }
+    else {
+        $NoCacheUrl = "$NoCacheUrl?cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+    }
+
+    return Invoke-RestMethod -Uri $NoCacheUrl -Headers @{
+        "Cache-Control" = "no-cache"
+        "Pragma" = "no-cache"
+        "User-Agent" = "CustomUniverse-Updater"
+    }
+}
+
 try {
     Write-Step "Verification de Prism Launcher"
 
@@ -90,13 +109,14 @@ try {
     }
 
     Write-Step "Lecture du manifest"
-    $Manifest = Invoke-RestMethod -Uri $ManifestUrl
+    $Manifest = Read-RemoteJson -Url $ManifestUrl
 
     if ($null -eq $Manifest.mods -or $Manifest.mods.Count -eq 0) {
         throw "Le manifest ne contient aucun mod a telecharger : $ManifestUrl"
     }
 
     Write-Ok "Manifest version $($Manifest.version) charge"
+    Write-Host "Mods attendus : $((@($Manifest.mods) | ForEach-Object { $_.name }) -join ', ')"
 
     $ExpectedModNames = @($Manifest.mods | ForEach-Object { $_.name })
 
@@ -144,6 +164,14 @@ try {
         }
 
         Write-Ok "Installe : $($Mod.name)"
+    }
+
+    foreach ($ExpectedModName in $ExpectedModNames) {
+        $ExpectedPath = Join-Path $ModsPath $ExpectedModName
+
+        if (-not (Test-Path -LiteralPath $ExpectedPath -PathType Leaf)) {
+            throw "Mod attendu introuvable apres mise a jour : $ExpectedModName"
+        }
     }
 
     Write-Step "Lancement de Minecraft"

@@ -93,6 +93,25 @@ function Download-File {
     }
 }
 
+function Read-RemoteJson {
+    param([Parameter(Mandatory = $true)][string] $Url)
+
+    $NoCacheUrl = $Url
+
+    if ($NoCacheUrl.Contains("?")) {
+        $NoCacheUrl = "$NoCacheUrl&cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+    }
+    else {
+        $NoCacheUrl = "$NoCacheUrl?cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+    }
+
+    return Invoke-RestMethod -Uri $NoCacheUrl -Headers @{
+        "Cache-Control" = "no-cache"
+        "Pragma" = "no-cache"
+        "User-Agent" = "CustomUniverse-Updater"
+    }
+}
+
 function Install-PrismLauncher {
     Write-Step "Installation de Prism Launcher"
 
@@ -244,13 +263,14 @@ function Update-Mods {
 
     Write-Step "Mise a jour des mods"
 
-    $Manifest = Invoke-RestMethod -Uri $Config.manifestUrl
+    $Manifest = Read-RemoteJson -Url $Config.manifestUrl
 
     if ($null -eq $Manifest.mods -or $Manifest.mods.Count -eq 0) {
         throw "Le manifest ne contient aucun mod : $($Config.manifestUrl)"
     }
 
     Write-Ok "Manifest version $($Manifest.version) charge"
+    Write-Host "Mods attendus : $((@($Manifest.mods) | ForEach-Object { $_.name }) -join ', ')"
 
     $ExpectedModNames = @($Manifest.mods | ForEach-Object { $_.name })
 
@@ -307,6 +327,14 @@ function Update-Mods {
         }
 
         Write-Ok "Installe : $($Mod.name)"
+    }
+
+    foreach ($ExpectedModName in $ExpectedModNames) {
+        $ExpectedPath = Join-Path $ModsPath $ExpectedModName
+
+        if (-not (Test-Path -LiteralPath $ExpectedPath -PathType Leaf)) {
+            throw "Mod attendu introuvable apres mise a jour : $ExpectedModName"
+        }
     }
 }
 
