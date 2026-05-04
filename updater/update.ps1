@@ -190,7 +190,8 @@ function Get-InstanceNameFromCfg {
 
 function Import-PrismInstance {
     param(
-        [Parameter(Mandatory = $true)] $Config
+        [Parameter(Mandatory = $true)] $Config,
+        [bool] $ReplaceExisting = $false
     )
 
     Write-Step "Import de l'instance"
@@ -227,7 +228,22 @@ function Import-PrismInstance {
         $DestinationInstancePath = Join-Path $InstancesRoot $InstanceName
 
         if (Test-Path -LiteralPath $DestinationInstancePath -PathType Container) {
-            Write-Ok "Instance deja presente : $InstanceName"
+            if ($ReplaceExisting) {
+                $ResolvedInstancesRoot = (Resolve-Path -LiteralPath $InstancesRoot).Path
+                $ResolvedDestination = (Resolve-Path -LiteralPath $DestinationInstancePath).Path
+
+                if (-not $ResolvedDestination.StartsWith($ResolvedInstancesRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    throw "Refus de supprimer une instance hors du dossier Prism : $ResolvedDestination"
+                }
+
+                Write-Host "Instance existante remplacee : $InstanceName"
+                Remove-Item -LiteralPath $DestinationInstancePath -Recurse -Force
+                Copy-Item -LiteralPath $SourceInstancePath -Destination $DestinationInstancePath -Recurse
+                Write-Ok "Instance importee : $InstanceName"
+            }
+            else {
+                Write-Ok "Instance deja presente : $InstanceName"
+            }
         }
         else {
             Copy-Item -LiteralPath $SourceInstancePath -Destination $DestinationInstancePath -Recurse
@@ -252,6 +268,7 @@ function Get-ModsPath {
 
     $ModsPath = Join-Path $Instance.Path ".minecraft\mods"
     New-Item -ItemType Directory -Path $ModsPath -Force | Out-Null
+    Write-Host "Dossier mods : $ModsPath"
     return $ModsPath
 }
 
@@ -336,6 +353,12 @@ function Update-Mods {
             throw "Mod attendu introuvable apres mise a jour : $ExpectedModName"
         }
     }
+
+    $InstalledHomeModNames = foreach ($Pattern in $Config.homeModPatterns) {
+        Get-ChildItem -Path $ModsPath -Filter $Pattern -File -ErrorAction SilentlyContinue | ForEach-Object { $_.Name }
+    }
+
+    Write-Host "Mods maison presents : $((@($InstalledHomeModNames) | Sort-Object -Unique) -join ', ')"
 }
 
 try {
@@ -355,9 +378,18 @@ try {
 
     Write-Ok "Prism Launcher trouve"
 
+    $ReplaceExistingInstance = $false
+
+    if ($null -ne $Config.replaceExistingInstance) {
+        $ReplaceExistingInstance = [bool]$Config.replaceExistingInstance
+    }
+
     $Instance = Find-ExistingInstance -Config $Config
 
-    if ($null -eq $Instance) {
+    if ($ReplaceExistingInstance) {
+        $Instance = Import-PrismInstance -Config $Config -ReplaceExisting $true
+    }
+    elseif ($null -eq $Instance) {
         $Instance = Import-PrismInstance -Config $Config
     }
     else {
