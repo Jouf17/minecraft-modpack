@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 # Force TLS 1.2 pour les telechargements HTTPS sur Windows PowerShell 5.1.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$PackageRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$PackageRoot = Split-Path -Parent $PSScriptRoot
 $ConfigPath = Join-Path $PSScriptRoot "config.json"
 
 function Write-Step {
@@ -179,7 +179,7 @@ function Import-PrismInstance {
     $ArchivePath = Join-Path $PackageRoot $Config.instanceArchive
 
     if (-not (Test-Path -LiteralPath $ArchivePath -PathType Leaf)) {
-        throw "Archive d'instance introuvable : $ArchivePath"
+        throw "Archive d'instance introuvable : $ArchivePath`nLe fichier doit etre place dans le dossier du launcher, par exemple : <dossier du pack>\$($Config.instanceArchive)"
     }
 
     $InstancesRoot = Join-Path $env:APPDATA "PrismLauncher\instances"
