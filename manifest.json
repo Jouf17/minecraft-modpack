@@ -3,12 +3,12 @@
   "mods": [
     {
       "name": "customuniverse-1.0.1.jar",
-      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/mods/customuniverse-1.0.1.jar",
+      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/refs/heads/main/mods/customuniverse-1.0.1.jar",
       "sha256": "5b582f50151c9794305fc389cb8809964d966f4764a1bd69a5d9cf2dd2f7ced6"
     },
     {
       "name": "customships-1.0.2.jar",
-      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/mods/customships-1.0.2.jar",
+      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/refs/heads/main/mods/customships-1.0.2.jar",
       "sha256": "d0c4b57f766ee00472e7a794e9fd66b3fb57fb9c5d88689a57d65ee8cfd530c7"
     }
   ]
