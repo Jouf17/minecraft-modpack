@@ -1,9 +1,15 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "mods": [
     {
-      "name": "customships-1.0.0.jar",
-      "url": "https://github.com/Jouf17/custom-ship/releases/download/v1.0.0/customships-1.0.0.jar"
+      "name": "customuniverse-1.0.0.jar",
+      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/mods/customuniverse-1.0.0.jar",
+      "sha256": "401887213b104fc58ac1fb226695c1f9c75a0bc94714208815ef827fa0d048a7"
+    },
+    {
+      "name": "customships-1.0.1.jar",
+      "url": "https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/mods/customships-1.0.1.jar",
+      "sha256": "78166b26a86f60d477f850be2a7b589e1d00efa34c93f0872fff894396d4095c"
     }
   ]
 }

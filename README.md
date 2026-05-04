@@ -54,9 +54,8 @@ https://raw.githubusercontent.com/Jouf17/minecraft-modpack/main/manifest.json
 Pour publier une mise a jour de mod :
 
 1. Compiler le nouveau `.jar`.
-2. Creer une GitHub Release publique.
-3. Ajouter le `.jar` dans les assets de la release.
-4. Modifier `manifest.json` avec le nouveau nom et la nouvelle URL.
-5. Commit puis push sur `main`.
+2. Placer le `.jar` dans `mods/`.
+3. Modifier `manifest.json` avec le nouveau nom, la nouvelle URL raw GitHub et le hash `sha256`.
+4. Commit puis push sur `main`.
 
 Change le nom du `.jar` a chaque version, par exemple `customships-1.0.1.jar`, pour que les anciennes versions soient remplacees proprement.
