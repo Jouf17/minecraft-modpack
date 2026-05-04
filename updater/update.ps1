@@ -56,6 +56,14 @@ function Find-PrismLauncher {
     return $null
 }
 
+function Assert-PrismNotRunning {
+    $RunningPrism = Get-Process -Name "prismlauncher" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if ($null -ne $RunningPrism) {
+        throw "Prism Launcher est ouvert. Ferme Prism puis relance Jouer.bat pour remplacer l'instance proprement."
+    }
+}
+
 function Download-File {
     param(
         [Parameter(Mandatory = $true)][string] $Url,
@@ -226,27 +234,53 @@ function Import-PrismInstance {
         }
 
         $DestinationInstancePath = Join-Path $InstancesRoot $InstanceName
+        $StagingInstancePath = Join-Path $InstancesRoot (".customuniverse-new-" + [guid]::NewGuid().ToString("N"))
+        $BackupInstancePath = Join-Path $InstancesRoot (".customuniverse-backup-" + [guid]::NewGuid().ToString("N"))
+
+        Copy-Item -LiteralPath $SourceInstancePath -Destination $StagingInstancePath -Recurse
+
+        if (-not (Test-Path -LiteralPath (Join-Path $StagingInstancePath "instance.cfg") -PathType Leaf)) {
+            Remove-Item -LiteralPath $StagingInstancePath -Recurse -Force
+            throw "La copie temporaire de l'instance est invalide : instance.cfg introuvable."
+        }
 
         if (Test-Path -LiteralPath $DestinationInstancePath -PathType Container) {
             if ($ReplaceExisting) {
                 $ResolvedInstancesRoot = (Resolve-Path -LiteralPath $InstancesRoot).Path
                 $ResolvedDestination = (Resolve-Path -LiteralPath $DestinationInstancePath).Path
 
-                if (-not $ResolvedDestination.StartsWith($ResolvedInstancesRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                if (-not $ResolvedDestination.StartsWith($ResolvedInstancesRoot + [IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    Remove-Item -LiteralPath $StagingInstancePath -Recurse -Force
                     throw "Refus de supprimer une instance hors du dossier Prism : $ResolvedDestination"
                 }
 
                 Write-Host "Instance existante remplacee : $InstanceName"
-                Remove-Item -LiteralPath $DestinationInstancePath -Recurse -Force
-                Copy-Item -LiteralPath $SourceInstancePath -Destination $DestinationInstancePath -Recurse
-                Write-Ok "Instance importee : $InstanceName"
+
+                try {
+                    Move-Item -LiteralPath $DestinationInstancePath -Destination $BackupInstancePath
+                    Move-Item -LiteralPath $StagingInstancePath -Destination $DestinationInstancePath
+                    Remove-Item -LiteralPath $BackupInstancePath -Recurse -Force
+                    Write-Ok "Instance importee : $InstanceName"
+                }
+                catch {
+                    if ((-not (Test-Path -LiteralPath $DestinationInstancePath -PathType Container)) -and (Test-Path -LiteralPath $BackupInstancePath -PathType Container)) {
+                        Move-Item -LiteralPath $BackupInstancePath -Destination $DestinationInstancePath
+                    }
+
+                    if (Test-Path -LiteralPath $StagingInstancePath -PathType Container) {
+                        Remove-Item -LiteralPath $StagingInstancePath -Recurse -Force
+                    }
+
+                    throw "Remplacement de l'instance impossible. L'ancienne instance a ete conservee si possible.`nDetail : $($_.Exception.Message)"
+                }
             }
             else {
+                Remove-Item -LiteralPath $StagingInstancePath -Recurse -Force
                 Write-Ok "Instance deja presente : $InstanceName"
             }
         }
         else {
-            Copy-Item -LiteralPath $SourceInstancePath -Destination $DestinationInstancePath -Recurse
+            Move-Item -LiteralPath $StagingInstancePath -Destination $DestinationInstancePath
             Write-Ok "Instance importee : $InstanceName"
         }
 
@@ -382,6 +416,10 @@ try {
 
     if ($null -ne $Config.replaceExistingInstance) {
         $ReplaceExistingInstance = [bool]$Config.replaceExistingInstance
+    }
+
+    if ($ReplaceExistingInstance) {
+        Assert-PrismNotRunning
     }
 
     $Instance = Find-ExistingInstance -Config $Config
