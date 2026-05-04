@@ -1,10 +1,10 @@
-# CustomUniverse
+# Constellation
 
 Package joueur pour rejoindre le serveur Minecraft Forge modde.
 
 ## Pour le joueur
 
-1. Telecharger le ZIP CustomUniverse depuis le site.
+1. Telecharger le ZIP Constellation depuis le site.
 2. Extraire le ZIP dans un dossier.
 3. Double-cliquer sur `Jouer.bat`.
 
@@ -21,7 +21,7 @@ Le serveur a rejoindre dans la liste Minecraft est :
 La structure finale a zipper doit etre :
 
 ```text
-CustomUniverse/
+Constellation/
 +-- Jouer.bat
 +-- instance/
 |   +-- 1.20.1.zip

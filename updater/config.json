@@ -3,10 +3,10 @@
   "serverAddress": "82.165.57.177:25566",
   "joinServerOnLaunch": false,
   "preferredInstanceNames": [
-    "CustomUniverse",
+    "Constellation",
     "1.20.1"
   ],
-  "instanceName": "CustomUniverse",
+  "instanceName": "Constellation",
   "instanceArchive": "instance/1.20.1.zip",
   "replaceExistingInstance": true,
   "homeModPatterns": [
