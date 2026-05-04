@@ -229,9 +229,31 @@ function Import-PrismInstance {
         $SourceInstancePath = Split-Path -Parent $InstanceCfg.FullName
         $InstanceName = Get-InstanceNameFromCfg -InstanceCfgPath $InstanceCfg.FullName
 
+        if ($null -ne $Config.instanceName -and -not [string]::IsNullOrWhiteSpace($Config.instanceName)) {
+            $InstanceName = [string]$Config.instanceName
+        }
+
         if ([string]::IsNullOrWhiteSpace($InstanceName)) {
             $InstanceName = $Config.preferredInstanceNames[0]
         }
+
+        $InstanceCfgContent = Get-Content -LiteralPath (Join-Path $SourceInstancePath "instance.cfg")
+        $HasNameLine = $false
+        $UpdatedInstanceCfgContent = foreach ($Line in $InstanceCfgContent) {
+            if ($Line -match "^name=") {
+                $HasNameLine = $true
+                "name=$InstanceName"
+            }
+            else {
+                $Line
+            }
+        }
+
+        if (-not $HasNameLine) {
+            $UpdatedInstanceCfgContent += "name=$InstanceName"
+        }
+
+        Set-Content -LiteralPath (Join-Path $SourceInstancePath "instance.cfg") -Value $UpdatedInstanceCfgContent -Encoding ASCII
 
         $DestinationInstancePath = Join-Path $InstancesRoot $InstanceName
         $StagingInstancePath = Join-Path $InstancesRoot (".customuniverse-new-" + [guid]::NewGuid().ToString("N"))

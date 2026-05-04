@@ -6,6 +6,7 @@
     "CustomUniverse",
     "1.20.1"
   ],
+  "instanceName": "CustomUniverse",
   "instanceArchive": "instance/1.20.1.zip",
   "replaceExistingInstance": true,
   "homeModPatterns": [
