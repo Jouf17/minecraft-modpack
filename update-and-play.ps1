@@ -74,10 +74,10 @@ function Read-RemoteJson {
     $NoCacheUrl = $Url
 
     if ($NoCacheUrl.Contains("?")) {
-        $NoCacheUrl = "$NoCacheUrl&cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+        $NoCacheUrl = "${NoCacheUrl}&cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
     }
     else {
-        $NoCacheUrl = "$NoCacheUrl?cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+        $NoCacheUrl = "${NoCacheUrl}?cacheBust=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
     }
 
     return Invoke-RestMethod -Uri $NoCacheUrl -Headers @{
